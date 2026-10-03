@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Modul Interaktif: Literasi Informasi & Tabayyun Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { 
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        arabic: ['"Amiri"', 'serif']
+                    },
+                    colors: {
+                        primary: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 900: '#0c4a6e' },
+                        emerald: { 50: '#ecfdf5', 500: '#10b981', 600: '#059669', 900: '#064e3b' },
+                        dark: { bg: '#0f172a', surface: '#1e293b', border: '#334155' }
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'slide-in-right': 'slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+                        'slide-in-left': 'slideInLeft 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+                        'pop': 'pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                    },
+                    keyframes: {
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+                        slideInRight: { '0%': { transform: 'translateX(100px)', opacity: 0 }, '100%': { transform: 'translateX(0)', opacity: 1 } },
+                        slideInLeft: { '0%': { transform: 'translateX(-100px)', opacity: 0 }, '100%': { transform: 'translateX(0)', opacity: 1 } },
+                        pop: { '0%': { transform: 'scale(0.95)', opacity: 0 }, '100%': { transform: 'scale(1)', opacity: 1 } }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            overflow: hidden; 
+            touch-action: none; 
+            -webkit-tap-highlight-color: transparent;
+            background-color: #f8fafc;
+        }
+        .dark body {
+            background-color: #0f172a;
+        }
+        /* Animated gradient background */
+        .bg-animated {
+            background: linear-gradient(-45deg, #e0f2fe, #f0fdfa, #f8fafc, #f1f5f9);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        .dark .bg-animated {
+            background: linear-gradient(-45deg, #0f172a, #1e293b, #0c4a6e, #064e3b);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08);
+        }
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+        }
+        
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+
+<body class="bg-animated text-slate-800 dark:text-slate-200 transition-colors duration-500 h-screen w-screen flex flex-col font-sans">
+    
+    <header class="h-16 flex items-center justify-between px-4 sm:px-8 z-20 w-full pt-4">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white flex items-center justify-center text-lg shadow-lg shadow-primary-500/30">
+                <i class="fa-solid fa-book-quran"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-sm sm:text-base leading-tight">Literasi Digital</h1>
+                <p class="text-[10px] sm:text-xs opacity-70 font-semibold">PERTEMUAN 2</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            <div class="text-xs font-bold bg-white/50 dark:bg-dark-surface/50 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm border border-slate-200 dark:border-dark-border">
+                <span id="progress-text" class="text-primary-600 dark:text-primary-400">1 / 15</span>
+            </div>
+            <button id="theme-toggle" class="w-10 h-10 rounded-xl bg-white dark:bg-dark-surface shadow-sm border border-slate-200 dark:border-dark-border flex items-center justify-center text-slate-600 dark:text-yellow-400 hover:scale-105 transition-transform">
+                <i class="fa-solid fa-moon dark:hidden"></i>
+                <i class="fa-solid fa-sun hidden dark:block"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="w-full px-4 sm:px-8 mt-4 z-20">
+        <div class="w-full h-2 bg-slate-200/50 dark:bg-slate-700/50 rounded-full overflow-hidden backdrop-blur-sm">
+            <div id="progress-bar" class="h-full bg-gradient-to-r from-primary-400 to-primary-600 transition-all duration-500 ease-out w-0 rounded-full"></div>
+        </div>
+    </div>
+
+    <main id="main-content" class="flex-1 relative overflow-hidden p-4 sm:p-8 flex flex-col justify-center items-center">
+        <!-- Content gets injected here -->
+    </main>
+
+    <footer class="h-24 px-4 sm:px-8 flex items-center justify-between z-20 w-full pb-6">
+        <button id="btn-prev" class="px-5 py-3.5 rounded-2xl bg-white dark:bg-dark-surface text-slate-700 dark:text-slate-200 shadow-sm border border-slate-200 dark:border-dark-border hover:bg-slate-50 dark:hover:bg-slate-800 font-bold flex items-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed transform active:scale-95">
+            <i class="fa-solid fa-arrow-left"></i> <span class="hidden sm:inline">Kembali</span>
+        </button>
+        
+        <button id="btn-next" class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-primary-600 to-primary-500 text-white shadow-xl shadow-primary-500/30 font-bold flex items-center gap-2 transition-all transform hover:-translate-y-1 active:scale-95">
+            <span id="btn-next-text">Mulai Belajar</span> <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </footer>
+
+    <script>
+        const slides = [
+            {
+                type: 'cover',
+                icon: 'fa-solid fa-globe',
+                iconColor: 'text-primary-500',
+                title: 'Literasi Informasi & Tabayyun Digital',
+                subtitle: 'Dari Informasi → Pemahaman → Karya → Manfaat',
+                content: 'Di era digital, persoalan utama manusia bukan lagi sekadar <b>mencari</b> informasi, tetapi bertahan dari <b>banjir</b> informasi.<br><br>Kemampuan digital yang sesungguhnya adalah mengolah banjir data tersebut menjadi kebenaran yang bermanfaat.'
+            },
+            {
+                type: 'content',
+                icon: 'fa-solid fa-book-open-reader',
+                iconColor: 'text-emerald-500',
+                title: 'Landasan Moral: Tabayyun',
+                content: `
+                    <div class="bg-emerald-50 dark:bg-emerald-900/20 p-5 rounded-2xl border border-emerald-100 dark:border-emerald-800/30 text-center mb-4 relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 opacity-10 text-6xl text-emerald-600"><i class="fa-solid fa-quote-right"></i></div>
+                        <p class="font-arabic text-2xl sm:text-3xl text-emerald-800 dark:text-emerald-300 mb-3 leading-relaxed">
+                            يَا أَيُّهَا الَّذِينَ آمَنُوا إِنْ جَاءَكُمْ فَاسِقٌ بِنَبَإٍ فَتَبَيَّنُوا
+                        </p>
+                        <p class="text-sm italic text-slate-600 dark:text-slate-300">
+                            "Hai orang-orang yang beriman, jika datang kepadamu orang fasik membawa suatu berita, maka periksalah dengan teliti (tabayyun)..."
+                        </p>
+                        <p class="text-xs font-bold mt-2 text-emerald-700 dark:text-emerald-400">QS. Al-Hujurat: 6</p>
+                    </div>
+                    <p class="text-sm sm:text-base text-center font-medium">Bagi pendidik PAI, literasi informasi bukan sekadar skill teknis, melainkan <b>kewajiban moral (amanah)</b> untuk menjaga umat dari fitnah dan hoaks.</p>
+                `
+            },
+            {
+                type: 'content',
+                icon: 'fa-solid fa-triangle-exclamation',
+                iconColor: 'text-rose-500',
+                title: '1. Informasi ≠ Kebenaran',
+                content: `
+                    <div class="grid grid-cols-2 gap-3 text-xs sm:text-sm mb-4">
+                        <div class="bg-white dark:bg-dark-surface p-3 rounded-xl border-l-4 border-rose-500 shadow-sm">
+                            <span class="text-rose-500 font-bold block mb-1">❌ Mitos:</span> Viral berarti benar.
+                        </div>
+                        <div class="bg-white dark:bg-dark-surface p-3 rounded-xl border-l-4 border-rose-500 shadow-sm">
+                            <span class="text-rose-500 font-bold block mb-1">❌ Mitos:</span> Dari tokoh = mutlak benar.
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-200 dark:border-blue-800/30">
+                        <h4 class="font-bold text-blue-700 dark:text-blue-300 flex items-center gap-2 text-sm mb-2">
+                            <i class="fa-solid fa-magnifying-glass-chart"></i> Fakta Nyata
+                        </h4>
+                        <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                            Kasus hoaks penganiayaan aktivis (2018) atau hoaks "Babi Ngepet" di Depok membuktikan bahwa <b>emosi dan simpati publik</b> sering mengalahkan verifikasi fakta awal.
+                        </p>
+                    </div>
+                `
+            },
+            {
+                type: 'content',
+                icon: 'fa-solid fa-gavel',
+                iconColor: 'text-amber-500',
+                title: 'Regulasi: UU ITE',
+                content: `
+                    <p class="text-sm text-center mb-4">Secara hukum positif, menyebarkan informasi tanpa verifikasi memiliki konsekuensi nyata.</p>
+                    
+                    <div class="p-5 bg-gradient-to-br from-slate-800 to-slate-900 text-white rounded-2xl shadow-xl relative">
+                        <div class="absolute top-0 right-0 bg-amber-500 text-xs font-bold px-3 py-1 rounded-bl-xl rounded-tr-xl">
+                            HUKUM POSITIF
+                        </div>
+                        <h3 class="font-bold text-lg mb-2 text-amber-400">Pasal 28 ayat (1) UU ITE</h3>
+                        <p class="text-sm text-slate-300 italic mb-3">
+                            "Setiap Orang dengan sengaja dan tanpa hak menyebarkan berita bohong dan menyesatkan yang mengakibatkan kerugian konsumen..."
+                        </p>
+                        <div class="flex items-center gap-2 text-xs font-bold text-amber-200 bg-black/30 p-2 rounded-lg">
+                            <i class="fa-solid fa-handcuffs"></i> Sanksi Pidana & Denda menanti pembuat/penyebar hoaks.
+                        </div>
+                    </div>
+                `
+            },
+            {
+                type: 'content',
+                icon: 'fa-solid fa-brain',
+                iconColor: 'text-purple-500',
+                title: '2. Literasi = Proses Berpikir',
+                content: `
+                    <p class="mb-3 text-sm sm:text-base text-center font-medium">Literasi bukan sekadar Googling, tapi rentetan pertanyaan kritis:</p>
+                    
+                    <div class="relative max-h-[40vh] overflow-y-auto hide-scroll px-1 space-y-2">
+                        <div class="flex items-center gap-3 bg-white dark:bg-dark-surface p-3 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+                            <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 font-bold">1</div>
+                            <span class="text-sm">Siapa penulis & lembaganya?</span>
+                        </div>
+                        <div class="flex items-center gap-3 bg-white dark:bg-dark-surface p-3 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+                            <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 font-bold">2</div>
+                            <span class="text-sm">Apa sumber & buktinya?</span>
+                        </div>
+                        <div class="flex items-center gap-3 bg-white dark:bg-dark-surface p-3 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+                            <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 font-bold">3</div>
+                            <span class="text-sm">Kapan info ini diterbitkan? (Relevansi)</span>
+                        </div>
+                        <div class="flex items-center gap-3 bg-white dark:bg-dark-surface p-3 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+                            <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 font-bold">4</div>
+                            <span class="text-sm">Apakah layak untuk dibagikan?</span>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                type: 'content',
+                icon: 'fa-solid fa-layer-group',
+                iconColor: 'text-indigo-500',
+                title: '3. Primer vs Sekunder',
+                content: `
+                    <div class="flex flex-col gap-3">
+                        <div class="p-4 bg-indigo-50 dark:bg-indigo-900/20 border-l-4 border-indigo-500 rounded-xl">
+                            <h3 class="font-bold flex items-center gap-2 text-indigo-700 dark:text-indigo-300">
+                                <i class="fa-solid fa-file-contract"></i> Sumber Primer
+                            </h3>
+                            <p class="text-xs sm:text-sm mt-1 text-slate-600 dark:text-slate-300">Dekat dengan peristiwa asli (Dokumen resmi, teks Al-Qur'an/Hadits, jurnal riset asli, rekaman CCTV).</p>
+                        </div>
+                        <div class="p-4 bg-slate-100 dark:bg-slate-800 border-l-4 border-slate-500 rounded-xl">
+                            <h3 class="font-bold flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                                <i class="fa-solid fa-newspaper"></i> Sumber Sekunder
+                            </h3>
+                            <p class="text-xs sm:text-sm mt-1 text-slate-600 dark:text-slate-300">Tafsir atau pengolahan atas sumber asli (Berita portal online, opini pakar, postingan sosmed).</p>
+                        </div>
+                        <p class="text-center font-bold text-xs mt-2 text-primary-600 dark:text-primary-400">
+                            Sebagai Akademisi: Selalu rujuk sumber primer jika memungkinkan!
+                        </p>
+                    </div>
+                `
+            },
+            {
+                type: 'content',
+                icon: 'fa-solid fa-masks-theater',
+                iconColor: 'text-pink-500',
+                title: '4. Awas Bias Konfirmasi',
+                content: `
+                    <p class="text-sm mb-3 text-center">Kita cenderung lebih percaya pada info yang mendukung keyakinan kita, meski info itu salah.</p>
+                    
+                    <div class="bg-pink-50 dark:bg-pink-900/20 p-4 rounded-xl border border-pink-200 mb-4">
+                        <h4 class="font-bold text-pink-700 dark:text-pink-300 text-sm mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-filter"></i> Fakta: Filter Bubble
+                        </h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-300">
+                            Algoritma media sosial sengaja <b>hanya menyajikan</b> konten yang Anda sukai. Ini mengurung kita dalam "gelembung" sehingga kita merasa opini kita adalah kebenaran mayoritas.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-pink-500 to-rose-500 p-3 rounded-xl text-white text-center shadow-md">
+                        <p class="font-bold italic text-sm">"Saya mungkin salah. Mari kita periksa (Tabayyun)."</p>
+                    </div>
+                `
+            },
+            {
+                type: 'content',
+                icon: 'fa-solid fa-code-compare',
+                iconColor: 'text-teal-500',
+                title: '5. Verifikasi 3 Sumber',
+                content: `
+                    <p class="text-sm mb-4 text-center font-medium">Jangan menelan info mentah. Terapkan Triangulasi Data:</p>
+                    
+                    <div class="flex justify-center items-center gap-1 sm:gap-3 mb-6 relative">
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-white dark:bg-dark-surface shadow border-2 border-teal-200 dark:border-teal-800 flex flex-col items-center justify-center z-10">
+                            <i class="fa-solid fa-globe text-teal-500 text-xl mb-1"></i>
+                            <span class="text-[10px] font-bold text-center leading-tight">Sumber A<br>(Portal Web)</span>
+                        </div>
+                        <i class="fa-solid fa-plus text-slate-400 text-xs"></i>
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-white dark:bg-dark-surface shadow border-2 border-teal-200 dark:border-teal-800 flex flex-col items-center justify-center z-10">
+                            <i class="fa-solid fa-book text-teal-500 text-xl mb-1"></i>
+                            <span class="text-[10px] font-bold text-center leading-tight">Sumber B<br>(Buku/Jurnal)</span>
+                        </div>
+                        <i class="fa-solid fa-plus text-slate-400 text-xs"></i>
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-white dark:bg-dark-surface shadow border-2 border-teal-200 dark:border-teal-800 flex flex-col items-center justify-center z-10">
+                            <i class="fa-solid fa-landmark text-teal-500 text-xl mb-1"></i>
+                            <span class="text-[10px] font-bold text-center leading-tight">Sumber C<br>(Resmi)</span>
+                        </div>
+                        
+                        <div class="absolute w-full h-1 bg-teal-100 dark:bg-teal-900 top-1/2 -translate-y-1/2 z-0"></div>
+                    </div>
+                    
+                    <div class="bg-teal-500 text-white p-3 rounded-xl text-center shadow-lg font-bold">
+                        Bandingkan! Temukan Benang Merahnya.
+                    </div>
+                `
+            },
+            {
+                type: 'content',
+                icon: 'fa-solid fa-robot',
+                iconColor: 'text-sky-500',
+                title: '6. AI & Fakta "Halusinasi"',
+                content: `
+                    <p class="text-sm mb-3 text-center">AI seperti ChatGPT membantu ide, tapi bukan sumber kebenaran mutlak.</p>
+                    
+                    <div class="bg-sky-50 dark:bg-sky-900/20 p-4 rounded-xl border border-sky-200 mb-4 text-sm">
+                        <h4 class="font-bold text-sky-700 dark:text-sky-300 mb-1">⚠️ Fakta: AI Hallucinations</h4>
+                        <p class="text-xs text-slate-600 dark:text-slate-300">
+                            AI bisa mengarang nama buku, penulis, dan dalil fiktif dengan tata bahasa yang sangat meyakinkan. Ini terjadi karena AI memprediksi kata (seperti *auto-complete* raksasa), bukan bernalar mencari fakta.
+                        </p>
+                    </div>
+                    
+                    <div class="flex items-center justify-between bg-white dark:bg-dark-surface p-2 rounded-xl shadow-sm text-xs font-bold border border-slate-200 dark:border-slate-700">
+                        <div class="px-2 py-1 text-sky-600">Tanya AI</div>
+                        <i class="fa-solid fa-arrow-right text-slate-300"></i>
+                        <div class="px-2 py-1 bg-rose-100 text-rose-600 rounded">Cek Sumber Asli</div>
+                        <i class="fa-solid fa-arrow-right text-slate-300"></i>
+                        <div class="px-2 py-1 bg-emerald-100 text-emerald-600 rounded">Karya Valid</div>
+                    </div>
+                `
+            },
+            {
+                type: 'content',
+                icon: 'fa-solid fa-chalkboard-user',
+                iconColor: 'text-primary-600',
+                title: '7. Amanah Pendidik PAI',
+                content: `
+                    <p class="text-sm mb-4 text-center">Sebagai (calon) guru Agama dan Pendakwah, informasi yang Anda sampaikan akan membentuk aqidah dan akhlak umat.</p>
+                    <div class="grid grid-cols-2 gap-3 text-xs sm:text-sm">
+                        <div class="bg-white dark:bg-dark-surface p-3 rounded-xl shadow-sm border-t-2 border-slate-300 text-center">
+                            Bukan sekadar<br><b class="text-slate-600 dark:text-slate-400">Viral / Fomo</b>
+                        </div>
+                        <div class="bg-primary-50 dark:bg-primary-900/30 p-3 rounded-xl shadow-sm border-t-2 border-primary-500 text-center">
+                            Tetapi<br><b class="text-primary-600 dark:text-primary-400">Pembimbing Umat</b>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-dark-surface p-3 rounded-xl shadow-sm border-t-2 border-slate-300 text-center">
+                            Bukan sekadar<br><b class="text-slate-600 dark:text-slate-400">Penyampai Info</b>
+                        </div>
+                        <div class="bg-primary-50 dark:bg-primary-900/30 p-3 rounded-xl shadow-sm border-t-2 border-primary-500 text-center">
+                            Tetapi<br><b class="text-primary-600 dark:text-primary-400">Penjaga Kebenaran</b>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                type: 'content',
+                icon: 'fa-solid fa-rocket',
+                iconColor: 'text-orange-500',
+                title: '8. Consumer → Contributor',
+                content: `
+                    <p class="text-sm text-center mb-4">Mahasiswa Semester 7 harus naik level dalam interaksi digital.</p>
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center justify-between bg-slate-100 dark:bg-slate-800 p-3 rounded-xl text-sm">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-mobile-screen w-5 text-slate-500"></i> Consumer</span>
+                            <span class="text-xs text-slate-500">Hanya Scroll/Baca</span>
+                        </div>
+                        <div class="flex justify-center -my-1 z-10"><i class="fa-solid fa-angle-down text-orange-500"></i></div>
+                        <div class="flex items-center justify-between bg-orange-50 dark:bg-orange-900/20 p-3 rounded-xl text-sm border border-orange-200">
+                            <span class="flex items-center gap-2 font-bold text-orange-600"><i class="fa-solid fa-pen-nib w-5"></i> Creator</span>
+                            <span class="text-xs text-orange-600">Mengolah Konten</span>
+                        </div>
+                        <div class="flex justify-center -my-1 z-10"><i class="fa-solid fa-angle-down text-emerald-500"></i></div>
+                        <div class="flex items-center justify-between bg-emerald-500 text-white p-4 rounded-xl text-sm shadow-lg transform scale-105">
+                            <span class="flex items-center gap-2 font-bold"><i class="fa-solid fa-earth-asia w-5"></i> Contributor</span>
+                            <span class="text-xs font-bold">Beri Manfaat Umat</span>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                type: 'content',
+                icon: 'fa-solid fa-star',
+                iconColor: 'text-yellow-500',
+                title: 'Rumus Akhir',
+                content: `
+                    <p class="text-sm text-center mb-5 font-semibold text-slate-600 dark:text-slate-300">Siklus Informasi yang Bernilai Pendidikan:</p>
+                    
+                    <div class="flex flex-wrap justify-center gap-3 text-xs font-bold text-white mb-6">
+                        <span class="bg-slate-400 px-4 py-2 rounded-full shadow-sm">INFO</span>
+                        <i class="fa-solid fa-arrow-right text-slate-400 my-auto"></i>
+                        <span class="bg-primary-400 px-4 py-2 rounded-full shadow-sm">PAHAM</span>
+                        <i class="fa-solid fa-arrow-right text-slate-400 my-auto"></i>
+                        <span class="bg-purple-400 px-4 py-2 rounded-full shadow-sm">INSIGHT</span>
+                        <i class="fa-solid fa-arrow-right text-slate-400 my-auto"></i>
+                        <span class="bg-orange-400 px-4 py-2 rounded-full shadow-sm">KARYA</span>
+                        <i class="fa-solid fa-arrow-right text-slate-400 my-auto"></i>
+                        <span class="bg-emerald-500 px-4 py-2 rounded-full shadow-md scale-110">MANFAAT</span>
+                    </div>
+                    
+                    <div class="p-4 bg-dark-surface text-white rounded-xl text-center shadow-xl border-l-4 border-yellow-500">
+                        <p class="italic text-sm">"Jangan hanya menjadi penyampai informasi; jadilah penjaga kebenaran melalui proses tabayyun."</p>
+                    </div>
+                `
+            },
+            {
+                type: 'quiz-intro',
+                icon: 'fa-solid fa-gamepad',
+                iconColor: 'text-primary-500',
+                title: 'Uji Tabayyun Digital',
+                content: 'Mari uji insting literasi dan pemahaman Anda terhadap konsep tabayyun digital dari materi ini.<br><br><b>Ada 5 pertanyaan yang menanti.</b>'
+            }
+        ];
+
+        const quizData = [
+            {
+                question: "Mana prinsip utama yang diajarkan dalam literasi informasi digital, sejalan dengan QS. Al-Hujurat ayat 6?",
+                options: [
+                    "Jika informasi dikirim oleh ustadz, pasti kebenarannya mutlak.",
+                    "Informasi yang viral wajib disebarkan ulang agar semua tahu.",
+                    "Berhenti, periksa teliti (tabayyun), pahami, lalu bertindak.",
+                    "Artificial Intelligence selalu menyajikan fakta yang sudah terverifikasi."
+                ],
+                correct: 2,
+                explanation: "Konsep Tabayyun mengharuskan kita menahan diri, memeriksa berlapis, sebelum meyakini dan menyebarkan."
+            },
+            {
+                question: "Terkait 'AI Hallucinations', sikap akademik yang paling tepat saat menggunakan AI untuk membuat makalah adalah...",
+                options: [
+                    "Meng-copy-paste semua output AI karena AI merangkum jutaan data internet.",
+                    "Menggunakan AI untuk mencari ide, lalu memverifikasi rujukan yang diberikan AI ke buku/sumber aslinya.",
+                    "Melarang sepenuhnya penggunaan AI dalam bentuk apapun.",
+                    "Memasukkan nama AI sebagai penulis utama (Author) di jurnal."
+                ],
+                correct: 1,
+                explanation: "AI bisa mengarang sumber palsu (halusinasi). AI membantu proses, tapi manusia WAJIB memverifikasi sumber aslinya."
+            },
+            {
+                question: "Seseorang hanya memfollow akun dan membaca berita yang sejalan dengan afiliasi politiknya, serta menolak membaca pendapat kelompok lain walau didukung data ilmiah. Fenomena ini disebut...",
+                options: [
+                    "Triangulasi Data",
+                    "Literasi Primer",
+                    "Bias Konfirmasi (Filter Bubble)",
+                    "Digital Contributor"
+                ],
+                correct: 2,
+                explanation: "Bias konfirmasi membuat kita terjebak hanya pada informasi yang meyakinkan pendapat kita (meski salah) dan diperparah oleh algoritma filter bubble."
+            },
+            {
+                question: "Anda menerima video viral kerusuhan. Sebelum menyebarkan, Anda mengecek portal berita resmi (sumber A), akun kepolisian (sumber B), dan jurnalis lapangan (sumber C). Proses ini disebut...",
+                options: [
+                    "Penyebaran Hoaks",
+                    "Verifikasi Triangulasi (3 Sumber)",
+                    "Konsumsi Digital",
+                    "Penurunan Insight"
+                ],
+                correct: 1,
+                explanation: "Membandingkan minimal 3 sumber berbeda untuk mencari fakta utuh adalah teknik dasar verifikasi (Triangulasi)."
+            },
+            {
+                question: "Berdasarkan UU ITE Pasal 28 ayat (1), tindakan apa yang bisa mendatangkan sanksi pidana dalam aktivitas digital?",
+                options: [
+                    "Menyimpan file berita hoaks di laptop pribadi tanpa disebar.",
+                    "Mencari sumber primer dari sebuah isu yang sedang viral.",
+                    "Sengaja menyebarkan berita bohong dan menyesatkan yang merugikan publik/konsumen.",
+                    "Membuat karya dakwah yang membandingkan dua opini pakar."
+                ],
+                correct: 2,
+                explanation: "UU ITE secara tegas melarang penyebaran informasi palsu/menyesatkan yang menimbulkan kerugian di masyarakat."
+            }
+        ];
+
+        let currentSlide = 0;
+        let isQuizMode = false;
+        let currentQuiz = 0;
+        let score = 0;
+        let isDarkMode = false;
+
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+        
+        function initAudio() {
+            if(!audioCtx) audioCtx = new AudioContext();
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playSound(type) {
+            try {
+                if(!audioCtx) return;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+                
+                if(type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now); osc.stop(now + 0.1);
+                } else if(type === 'slide') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.linearRampToValueAtTime(400, now + 0.1);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                    osc.start(now); osc.stop(now + 0.1);
+                } else if(type === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
+                } else if(type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(250, now);
+                    osc.frequency.linearRampToValueAtTime(150, now + 0.3);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
+                } else if(type === 'win') {
+                    osc.type = 'square';
+                    [523, 659, 783, 1046].forEach((freq, i) => {
+                        osc.frequency.setValueAtTime(freq, now + (i*0.1));
+                    });
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                    osc.start(now); osc.stop(now + 0.5);
+                }
+            } catch(e) { console.log('Audio error ignored'); }
+        }
+
+        const mainContent = document.getElementById('main-content');
+        const btnNext = document.getElementById('btn-next');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNextText = document.getElementById('btn-next-text');
+        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById('progress-bar');
+        const themeToggle = document.getElementById('theme-toggle');
+
+        function toggleTheme() {
+            initAudio();
+            isDarkMode = !isDarkMode;
+            document.documentElement.classList.toggle('dark');
+            playSound('click');
+        }
+
+        function renderSlide(direction = 'right') {
+            mainContent.innerHTML = '';
+            const animationClass = direction === 'right' ? 'animate-slide-in-right' : 'animate-slide-in-left';
+            
+            if (!isQuizMode) {
+                const slide = slides[currentSlide];
+                const html = `
+                    <div class="w-full max-w-xl glass-card rounded-3xl p-6 sm:p-10 ${animationClass} flex flex-col items-center mx-4 max-h-full overflow-y-auto hide-scroll relative z-10">
+                        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white dark:bg-dark-surface shadow-md flex items-center justify-center mb-6 transform rotate-3 animate-float border border-slate-100 dark:border-slate-700">
+                            <i class="${slide.icon} ${slide.iconColor} text-4xl sm:text-5xl"></i>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white mb-2 text-center leading-tight tracking-tight">${slide.title}</h2>
+                        ${slide.subtitle ? `<h3 class="text-primary-600 dark:text-primary-400 font-bold mb-6 text-center text-sm uppercase tracking-widest">${slide.subtitle}</h3>` : '<div class="h-4"></div>'}
+                        <div class="text-slate-700 dark:text-slate-200 text-base w-full flex-1">
+                            ${slide.content}
+                        </div>
+                    </div>
+                `;
+                mainContent.innerHTML = html;
+            } else {
+                renderQuizSlide(animationClass);
+            }
+            updateControls();
+        }
+
+        function renderQuizSlide(animationClass) {
+            if (currentQuiz >= quizData.length) {
+                renderResult(animationClass);
+                return;
+            }
+
+            const q = quizData[currentQuiz];
+            let optionsHtml = q.options.map((opt, index) => `
+                <button onclick="checkAnswer(${index})" class="w-full text-left p-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-dark-surface hover:border-primary-500 dark:hover:border-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all font-medium text-sm sm:text-base mb-3 group flex items-start gap-3">
+                    <span class="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-500 font-bold group-hover:bg-primary-500 group-hover:text-white transition-colors">${String.fromCharCode(65 + index)}</span>
+                    <span class="mt-1">${opt}</span>
+                </button>
+            `).join('');
+
+            mainContent.innerHTML = `
+                <div class="w-full max-w-xl glass-card rounded-3xl p-6 sm:p-8 ${animationClass} flex flex-col mx-4 max-h-full overflow-y-auto hide-scroll z-10">
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-primary-500 font-bold uppercase tracking-wider text-xs bg-primary-50 dark:bg-primary-900/30 px-3 py-1 rounded-full"><i class="fa-solid fa-bolt text-yellow-500 mr-1"></i> Kuis Evaluasi</span>
+                        <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Soal ${currentQuiz + 1} / ${quizData.length}</span>
+                    </div>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-800 dark:text-white mb-6 leading-relaxed">${q.question}</h2>
+                    <div id="options-container" class="w-full flex-1">
+                        ${optionsHtml}
+                    </div>
+                    <div id="feedback-container" class="hidden mt-2 p-4 rounded-xl text-sm font-medium animate-pop border"></div>
+                </div>
+            `;
+            
+            btnNext.style.display = 'none';
+            btnPrev.style.display = 'none';
+        }
+
+        window.checkAnswer = function(selectedIndex) {
+            initAudio();
+            const q = quizData[currentQuiz];
+            const isCorrect = selectedIndex === q.correct;
+            const buttons = document.querySelectorAll('#options-container button');
+            const feedback = document.getElementById('feedback-container');
+
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                btn.classList.remove('hover:border-primary-500', 'hover:bg-primary-50', 'dark:hover:bg-primary-900/20');
+                
+                if (i === q.correct) {
+                    btn.classList.add('border-emerald-500', 'bg-emerald-50', 'dark:bg-emerald-900/30');
+                    btn.querySelector('span').classList.add('bg-emerald-500', 'text-white');
+                } else if (i === selectedIndex && !isCorrect) {
+                    btn.classList.add('border-rose-500', 'bg-rose-50', 'dark:bg-rose-900/30');
+                    btn.querySelector('span').classList.add('bg-rose-500', 'text-white');
+                } else {
+                    btn.classList.add('opacity-40');
+                }
+            });
+
+            if (isCorrect) {
+                score += 100 / quizData.length;
+                playSound('correct');
+                feedback.innerHTML = `<div class="flex items-start gap-3 text-emerald-700 dark:text-emerald-300"><i class="fa-solid fa-circle-check mt-1 text-lg"></i> <div><b class="uppercase tracking-wide">Benar</b><br><span class="text-xs mt-1 block opacity-90">${q.explanation}</span></div></div>`;
+                feedback.classList.add('bg-emerald-100', 'dark:bg-emerald-900/50', 'border-emerald-200', 'dark:border-emerald-800', 'block');
+                feedback.classList.remove('hidden');
+            } else {
+                playSound('wrong');
+                feedback.innerHTML = `<div class="flex items-start gap-3 text-rose-700 dark:text-rose-300"><i class="fa-solid fa-circle-xmark mt-1 text-lg"></i> <div><b class="uppercase tracking-wide">Kurang Tepat</b><br><span class="text-xs mt-1 block opacity-90">${q.explanation}</span></div></div>`;
+                feedback.classList.add('bg-rose-100', 'dark:bg-rose-900/50', 'border-rose-200', 'dark:border-rose-800', 'block');
+                feedback.classList.remove('hidden');
+            }
+
+            btnNext.style.display = 'flex';
+            btnNextText.innerText = currentQuiz === quizData.length - 1 ? 'Lihat Hasil' : 'Lanjut';
+        }
+
+        function renderResult(animationClass) {
+            playSound('win');
+            let message = '';
+            let icon = '';
+            
+            if(score === 100) { message = "Luar biasa! Insting verifikasimu sangat tajam."; icon = "fa-trophy text-yellow-500"; } 
+            else if(score >= 80) { message = "Sangat baik. Pemahamanmu tentang Tabayyun sudah mantap."; icon = "fa-medal text-emerald-500"; } 
+            else if(score >= 60) { message = "Cukup baik, tapi masih perlu lebih berhati-hati menerima info."; icon = "fa-thumbs-up text-primary-500"; } 
+            else { message = "Mari baca ulang materinya. Verifikasi informasi butuh latihan!"; icon = "fa-book-open text-rose-500"; }
+
+            mainContent.innerHTML = `
+                <div class="w-full max-w-md glass-card rounded-3xl p-8 text-center ${animationClass} flex flex-col items-center z-10">
+                    <div class="w-24 h-24 bg-white dark:bg-dark-surface rounded-full flex items-center justify-center shadow-lg mb-6 border border-slate-100 dark:border-slate-700">
+                        <i class="fa-solid ${icon} text-5xl animate-pop"></i>
+                    </div>
+                    <h2 class="text-4xl font-black text-slate-800 dark:text-white mb-2">${Math.round(score)}<span class="text-lg text-slate-400">/100</span></h2>
+                    <p class="text-slate-600 dark:text-slate-300 mb-8 text-sm font-medium leading-relaxed">${message}</p>
+                    
+                    <button onclick="resetModule()" class="w-full py-4 rounded-xl bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 text-white font-bold shadow-lg flex items-center justify-center gap-3 transition-transform active:scale-95">
+                        <i class="fa-solid fa-rotate-right"></i> Ulangi Pembelajaran
+                    </button>
+                </div>
+            `;
+            
+            btnNext.style.display = 'none';
+            btnPrev.style.display = 'none';
+            progressBar.style.width = '100%';
+            progressText.innerText = "Selesai";
+        }
+
+        window.resetModule = function() {
+            initAudio(); playSound('slide');
+            currentSlide = 0; isQuizMode = false; currentQuiz = 0; score = 0;
+            btnNext.style.display = 'flex'; btnPrev.style.display = 'flex';
+            renderSlide('left');
+        }
+
+        function updateControls() {
+            let totalSteps = slides.length + quizData.length;
+            let currentStep = isQuizMode ? slides.length + currentQuiz + 1 : currentSlide + 1;
+
+            if (!isQuizMode) {
+                btnPrev.disabled = currentSlide === 0;
+                if (currentSlide === slides.length - 1) {
+                    btnNextText.innerText = 'Mulai Kuis';
+                    btnNext.classList.replace('from-primary-600', 'from-yellow-500');
+                    btnNext.classList.replace('to-primary-500', 'to-orange-500');
+                    btnNext.classList.replace('shadow-primary-500/30', 'shadow-yellow-500/30');
+                } else {
+                    btnNextText.innerText = currentSlide === 0 ? 'Mulai Belajar' : 'Selanjutnya';
+                    btnNext.classList.replace('from-yellow-500', 'from-primary-600');
+                    btnNext.classList.replace('to-orange-500', 'to-primary-500');
+                    btnNext.classList.replace('shadow-yellow-500/30', 'shadow-primary-500/30');
+                }
+            }
+            progressText.innerText = `${currentStep} / ${totalSteps}`;
+            progressBar.style.width = `${(currentStep / totalSteps) * 100}%`;
+        }
+
+        btnNext.addEventListener('click', () => {
+            initAudio(); playSound('slide');
+            if (!isQuizMode) {
+                if (currentSlide < slides.length - 1) { currentSlide++; renderSlide('right'); } 
+                else { isQuizMode = true; renderSlide('right'); }
+            } else {
+                currentQuiz++; renderSlide('right');
+            }
+        });
+
+        btnPrev.addEventListener('click', () => {
+            initAudio(); playSound('slide');
+            if (!isQuizMode && currentSlide > 0) { currentSlide--; renderSlide('left'); }
+        });
+
+        themeToggle.addEventListener('click', toggleTheme);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' && btnNext.style.display !== 'none' && !btnNext.disabled) btnNext.click();
+            else if (e.key === 'ArrowLeft' && btnPrev.style.display !== 'none' && !btnPrev.disabled) btnPrev.click();
+        });
+
+        // Initialize App
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) toggleTheme();
+        renderSlide('right');
+    </script>
+</body>
+</html>
